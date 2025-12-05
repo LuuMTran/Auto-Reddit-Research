@@ -1,5 +1,4 @@
 from customtkinter import *
-from utils.crawler import *
 import undetected_chromedriver as uc
 import time
 import pandas as pd
@@ -9,6 +8,7 @@ from utils.full_automa import *
 class ToplevelWindowAutomata(CTkToplevel):
     def __init__(self, master=None, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
+        self.title = "Automatic Mode"
         self.geometry("400x300")
         full_pipeline_start()
 
@@ -19,8 +19,8 @@ class ToplevelWindowMannual(CTkToplevel):
         self.geometry("400x300")
         self.df = pd.DataFrame(columns=["Topic", "Comment"])
         self.html_visit = set()
-
-        self.driver = uc.Chrome(headless=False, use_subprocess=False)
+        self.title = "Mannual Mode"
+        self.driver = uc.Chrome(headless=False, use_subprocess=False, version_main=142)
         self.btn = CTkButton(
             master=self,
             text="Capture Comment",
@@ -31,8 +31,21 @@ class ToplevelWindowMannual(CTkToplevel):
             border_width=2,
             command=self.capture_comment,
         )
+        self.btn_save = CTkButton(
+            master=self,
+            text="Save Comment",
+            corner_radius=32,
+            fg_color="#4158D0",
+            hover_color="#0019FC",
+            border_color="#FFCC70",
+            border_width=2,
+            command=self.save_comment,
+        )
         self.btn.place(relx=0.5, rely=0.5, anchor="center")
+        self.btn_save.place(relx=0.5, rely=0.6, anchor="center")
         self.geturl(url)
+    def save_comment(self):
+        self.df.to_csv(r"./checkpoints/comment_data.csv", header=False)
 
     def geturl(self, url):
         if not isinstance(url, str):
@@ -104,4 +117,5 @@ class App(CTk):
 
 if __name__ == "__main__":
     app = App()
+    app.title("Auto Reddit Research")
     app.mainloop()

@@ -33,7 +33,9 @@ def sematic_search(comments, querys, threshold=0.6):
     model = BGEM3FlagModel("BAAI/bge-m3", use_fp16=True)
     df_querys = []
     comment_encode_dict = {}
+    count = 0
     for query in querys:
+        print(f"Starting Classify {query}")
         df = pd.DataFrame(
             columns=["Topic", "Comment", "Confidence"],
         )
@@ -42,6 +44,9 @@ def sematic_search(comments, querys, threshold=0.6):
         )
         for comment in comments:
             if comment_encode_dict.get(comment) is None:
+                if count % 100 == 0:
+                    print("Encoding comment...")
+                    count+=1
                 comment_encode = model.encode(
                     comment,
                     return_dense=True,
